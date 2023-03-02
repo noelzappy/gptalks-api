@@ -6,6 +6,7 @@ const createMessage = {
     chat: Joi.string().custom(objectId).required(),
     message: Joi.string().required(),
     quote: Joi.string().custom(objectId),
+    parentMessageId: Joi.string(),
   }),
 };
 

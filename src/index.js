@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
+const { createServer } = require('http');
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
+const { startServer } = require('./socket');
+
+const httpServer = createServer(app);
 
 // Mongoose Strict Query Deprecation Warning suppression
 mongoose.set('strictQuery', false);
@@ -9,9 +13,16 @@ mongoose.set('strictQuery', false);
 let server;
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
-  server = app.listen(config.port, () => {
+
+  startServer(httpServer);
+
+  server = httpServer.listen(process.env.PORT || config.port, () => {
     logger.info(`Listening to port ${config.port}`);
   });
+
+  // server = app.listen(config.port, () => {
+
+  // });
 });
 
 const exitHandler = () => {

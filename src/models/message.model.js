@@ -24,6 +24,9 @@ const messageSchema = mongoose.Schema(
     date: { type: Date, default: Date.now },
     read: { type: Boolean, default: false },
     quote: { type: mongoose.Schema.Types.ObjectId, ref: 'Message' },
+    parentMessageId: {
+      type: String,
+    },
   },
   {
     timestamps: true,

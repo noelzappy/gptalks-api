@@ -1,23 +1,22 @@
-const { Configuration, OpenAIApi } = require('openai');
+// const { Configuration, OpenAIApi } = require('openai');
 
 const config = require('./config');
 
-const configuration = new Configuration({
-  apiKey: config.openai.apiKey,
-  organization: 'org-B6iqGxLkGxXx9kew0EAWMdyf',
-});
-const openai = new OpenAIApi(configuration);
+// const configuration = new Configuration({
+//   apiKey: config.openai.apiKey,
+//   organization: 'org-B6iqGxLkGxXx9kew0EAWMdyf',
+// });
 
 class GPT {
+  api = null;
+
   constructor() {
-    this.completion = this.completion.bind(this);
+    this.init();
   }
 
-  async completion(prompt) {
-    return openai.createCompletion({
-      prompt,
-      model: 'gpt-3.5-turbo-0301',
-    });
+  async init() {
+    const { ChatGPTAPI } = await import('chatgpt');
+    this.api = new ChatGPTAPI({ apiKey: config.openai.apiKey });
   }
 }
 

@@ -3,11 +3,45 @@ const pick = require('../utils/pick');
 // const ApiError = require('../utils/ApiError');
 const catchAsync = require('../utils/catchAsync');
 const { messageService } = require('../services');
-
+const gpt = require('../config/gpt');
+const { getIO } = require('../socket');
 
 const createMessage = catchAsync(async (req, res) => {
-  const message = await messageService.createMessage({ ...req.body, user: req.user.id, sender: 'user', read: true });
-  res.status(httpStatus.CREATED).send(message);
+  const ios = getIO();
+
+  const result = await gpt.api.sendMessage(req.body.message, {
+    parentMessageId: req.body.parentMessageId,
+    onProgress: (partialResponse) => {
+      ios.emit(`${req.body.chat}_message`, {
+        chat: req.body.chat,
+        user: req.body.user,
+        sender: 'bot',
+        message: partialResponse.text,
+        read: true,
+        parentMessageId: partialResponse.parentMessageId,
+      });
+    },
+  });
+
+  const userMessage = {
+    ...req.body,
+    user: req.user.id,
+    sender: 'user',
+    read: true,
+    parentMessageId: result.parentMessageId,
+  };
+  const botMessage = {
+    chat: req.body.chat,
+    user: req.user.id,
+    sender: 'bot',
+    message: result.text,
+    read: false,
+    parentMessageId: result.parentMessageId,
+  };
+
+  const messages = await messageService.createMessages([userMessage, botMessage]);
+
+  res.status(httpStatus.CREATED).send(messages[1]);
 });
 
 const getMessages = catchAsync(async (req, res) => {

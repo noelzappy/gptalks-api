@@ -6,6 +6,10 @@ const createMessage = async (messageBody) => {
   return Message.create(messageBody);
 };
 
+const createMessages = async (messages) => {
+  return Message.insertMany(messages);
+};
+
 const queryMessages = async (filter, options) => {
   const messages = await Message.paginate(filter, options);
   return messages;
@@ -29,4 +33,5 @@ module.exports = {
   queryMessages,
   getMessageById,
   deleteMessageById,
+  createMessages,
 };
