@@ -9,6 +9,6 @@ const router = express.Router();
 router
   .route('/me')
   .get(auth(), userController.getMe)
-  .patch(auth(), validate(userValidation.updateMe), userController.updateMe);
+  .put(auth(), validate(userValidation.updateMe), userController.updateMe);
 
 module.exports = router;
