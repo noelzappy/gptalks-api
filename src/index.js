@@ -1,9 +1,12 @@
 const mongoose = require('mongoose');
 const { createServer } = require('http');
+const { Server: SocketServer } = require('socket.io');
+const authSocketMiddleware = require('./middlewares/socketAuth');
+
 const app = require('./app');
 const config = require('./config/config');
 const logger = require('./config/logger');
-const { startServer } = require('./socket');
+const { onConnection } = require('./socket');
 
 const httpServer = createServer(app);
 
@@ -11,10 +14,14 @@ const httpServer = createServer(app);
 mongoose.set('strictQuery', false);
 
 let server;
+
 mongoose.connect(config.mongoose.url, config.mongoose.options).then(() => {
   logger.info('Connected to MongoDB');
 
-  startServer(httpServer);
+  const io = new SocketServer(httpServer);
+  io.use(authSocketMiddleware);
+
+  io.on('connection', onConnection);
 
   server = httpServer.listen(process.env.PORT || config.port, () => {
     logger.info(`Listening to port ${config.port}`);

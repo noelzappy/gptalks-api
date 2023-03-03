@@ -4,23 +4,10 @@ const pick = require('../utils/pick');
 const catchAsync = require('../utils/catchAsync');
 const { messageService } = require('../services');
 const gpt = require('../config/gpt');
-const { getIO } = require('../socket');
 
 const createMessage = catchAsync(async (req, res) => {
-  const ios = getIO();
-
   const result = await gpt.api.sendMessage(req.body.message, {
     parentMessageId: req.body.parentMessageId,
-    onProgress: (partialResponse) => {
-      ios.emit(`${req.body.chat}_message`, {
-        chat: req.body.chat,
-        user: req.body.user,
-        sender: 'bot',
-        message: partialResponse.text,
-        read: true,
-        parentMessageId: partialResponse.parentMessageId,
-      });
-    },
   });
 
   const userMessage = {

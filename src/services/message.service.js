@@ -28,10 +28,16 @@ const deleteMessageById = async (messageId) => {
   return message;
 };
 
+const getLast50Messages = async (chatId) => {
+  const messages = await Message.find({ chat: chatId }).sort({ createdAt: -1 }).limit(50).exec();
+  return messages;
+};
+
 module.exports = {
   createMessage,
   queryMessages,
   getMessageById,
   deleteMessageById,
   createMessages,
+  getLast50Messages,
 };
