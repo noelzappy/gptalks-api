@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 const gpt = require('../config/gpt');
-const { chatService, messageService } = require('../services');
+const { messageService } = require('../services');
 
 module.exports = (socket) => {
   const onJoinChat = async (data) => {
@@ -23,6 +23,7 @@ module.exports = (socket) => {
     socket.to(data.chatId).emit('leaveChat', {
       user: socket.user,
     });
+    socket.disconnect();
   };
 
   const onMessage = async (data) => {
