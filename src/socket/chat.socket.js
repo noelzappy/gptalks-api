@@ -30,6 +30,17 @@ module.exports = (socket) => {
       const { user } = socket;
       const { chat, message, parentMessageId } = data;
 
+      const userMessage = {
+        ...data,
+        user: user.id,
+        sender: 'user',
+        read: true,
+      };
+
+      const sentMessage = await messageService.createMessage(userMessage);
+
+      socket.to(data.chat).emit('message', sentMessage.toJSON());
+
       const result = await gpt.api.sendMessage(message, {
         parentMessageId,
         onProgress: (partialResponse) => {
@@ -51,23 +62,12 @@ module.exports = (socket) => {
         parentMessageId: result.parentMessageId,
       };
 
-      const userMessage = {
-        ...data,
-        user: user.id,
-        sender: 'user',
-        read: true,
-        parentMessageId: result.parentMessageId,
-      };
+      const msg = await messageService.createMessage(botMessage);
 
-      const messages = await messageService.createMessages([userMessage, botMessage]);
-
-      socket.to(data.chat).emit(
-        'message',
-        messages.map((msg) => msg.toJSON())
-      );
+      socket.to(data.chat).emit('message', msg.toJSON());
       socket.to(data.chat).emit('stopTyping', {});
     } catch (e) {
-      socket.to(data.chat).emit('message', { message: 'Error', sender: 'bot' });
+      socket.to(data.chat).emit('appError', { message: 'Error', sender: 'bot' });
     }
   };
 
