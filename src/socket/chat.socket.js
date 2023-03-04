@@ -1,4 +1,3 @@
-const crypto = require('crypto');
 const gpt = require('../config/gpt');
 const { messageService } = require('../services');
 
@@ -31,18 +30,6 @@ module.exports = (socket) => {
       const { user } = socket;
       const { chat, message, parentMessageId } = data;
 
-      const userMessage = {
-        ...data,
-        user: user.id,
-        sender: 'user',
-        read: true,
-        id: crypto.randomBytes(16).toString('hex'),
-      };
-
-      socket.to(data.chat).emit('messageSent', userMessage);
-
-      delete userMessage.id;
-
       const result = await gpt.api.sendMessage(message, {
         parentMessageId,
         onProgress: (partialResponse) => {
@@ -64,9 +51,20 @@ module.exports = (socket) => {
         parentMessageId: result.parentMessageId,
       };
 
+      const userMessage = {
+        ...data,
+        user: user.id,
+        sender: 'user',
+        read: true,
+        parentMessageId: result.parentMessageId,
+      };
+
       const messages = await messageService.createMessages([userMessage, botMessage]);
 
-      socket.to(data.chat).emit('message', messages[1].toJSON());
+      socket.to(data.chat).emit(
+        'message',
+        messages.map((msg) => msg.toJSON())
+      );
       socket.to(data.chat).emit('stopTyping', {});
     } catch (e) {
       socket.to(data.chat).emit('message', { message: 'Error', sender: 'bot' });
