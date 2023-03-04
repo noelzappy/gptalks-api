@@ -5,3 +5,4 @@ module.exports.userService = require('./user.service');
 module.exports.chatService = require('./chat.service');
 module.exports.messageService = require('./message.service');
 module.exports.postService = require('./post.service');
+module.exports.replyService = require('./reply.service');
