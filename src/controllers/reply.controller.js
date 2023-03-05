@@ -12,6 +12,7 @@ const createReply = catchAsync(async (req, res) => {
 const getReplies = catchAsync(async (req, res) => {
   const filter = pick(req.query, ['text', 'post', 'parentReply']);
   const options = pick(req.query, ['sortBy', 'limit', 'page']);
+  options.populate = 'user';
   const result = await replyService.queryReplies(filter, options);
   res.send(result);
 });
