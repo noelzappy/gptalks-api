@@ -6,6 +6,7 @@ const updateMe = {
     name: Joi.string(),
     email: Joi.string().email(),
     password: Joi.string().custom(password),
+    avatar: Joi.any(),
   }),
 };
 

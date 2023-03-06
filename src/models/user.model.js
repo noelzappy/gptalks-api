@@ -44,6 +44,11 @@ const userSchema = mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    avatar: {
+      type: String,
+      trim: true,
+      default: 'https://picsum.photos/200/300',
+    },
   },
   {
     timestamps: true,
