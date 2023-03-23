@@ -1,4 +1,4 @@
-# RESTful API for the GPTalks App
+# RESTful API for the [GPTalks App](https://github.com/noelzappy/gptalks)
 
 ## Quick Start
 
